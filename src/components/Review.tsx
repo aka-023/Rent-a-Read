@@ -148,7 +148,7 @@ const ReviewComponent = ({ bookId }: { bookId: string }) => {
                     date={review.createdAt}
                     rating={review.rating}
                     review={review.reviewText}
-                    username={review.userId.username || ""}
+                    username={review.userId?.username || ""}
                     avatarUrl={`/defaultprofile.jpg`}
                     key={user?.id}
                   />

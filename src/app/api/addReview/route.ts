@@ -10,10 +10,6 @@ export async function POST(req: NextRequest) {
 
     // Validate required data
     if (!bookId || !username || rating == null || !reviewText) {
-      // console.log("USERNAME: ", username);
-      // console.log("rating: ", rating);
-      // console.log("newReview: ", reviewText);
-      // console.log("bookid: ", bookId);
       return NextResponse.json(
         {
           message: "Book ID, username, rating, and reviewText are required",
