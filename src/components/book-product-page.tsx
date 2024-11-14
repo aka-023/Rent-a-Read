@@ -106,7 +106,7 @@ export function BookProductPageComponent({
       const response = await axios.post(
         `http://localhost:3000/api/addtocart/${slugString}`,
         {
-          username: localStorage.getItem("username"),
+          username: user?.username,
         }
       );
       if (response.data.status === true) {
