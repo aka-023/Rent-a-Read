@@ -18,7 +18,14 @@ interface NewReview {
   username: string;
 }
 
-const ReviewComponent = ({ bookId }: { bookId: string }) => {
+const ReviewComponent = ({
+  bookId,
+  updateRating,
+}: {
+  bookId: string;
+  updateRating: () => Promise<void>;
+}) => {
+  const router = useRouter();
   const { user, isSignedIn } = useUser();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState("");
@@ -26,15 +33,12 @@ const ReviewComponent = ({ bookId }: { bookId: string }) => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await fetch(
-          `/api/addReview/${bookId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`/api/addReview/${bookId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
         const result = await response.json();
         if (result.status) {
@@ -82,6 +86,7 @@ const ReviewComponent = ({ bookId }: { bookId: string }) => {
         };
         setReviews((prevReviews) => [result.review, ...prevReviews]);
         setNewReview("");
+        updateRating();
       } else {
         console.error("Failed to add review:", result.message);
         alert("Please login to add Review!!");

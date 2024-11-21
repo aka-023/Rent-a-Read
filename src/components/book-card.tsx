@@ -4,12 +4,13 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { BookOpen, DollarSign } from "lucide-react";
+import { BookOpen, Star } from "lucide-react";
 import { PersonIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 
 interface BookCardProps {
   id: string;
@@ -18,6 +19,12 @@ interface BookCardProps {
   lender: string;
   coverImage: string;
   price: number;
+}
+interface Review {
+  rating: number;
+  reviewText: string;
+  userId: { username: string };
+  createdAt: string;
 }
 
 export function BookCardComponent({
@@ -28,18 +35,46 @@ export function BookCardComponent({
   coverImage,
   price,
 }: BookCardProps) {
-
   const router = useRouter();
-  const {user}  =useUser();
-  
+  const { user } = useUser();
+  const [avgRating, setAvgRating] = useState(0);
+  const [ratings, setRatings] = useState(0);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(`/api/addReview/${id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const result = await response.json();
+        const reviews = result.reviews;
+        setRatings(reviews.length);
+        const averageRating =
+          reviews.length != 0
+            ? reviews.reduce(
+                (sum: number, review: Review) => sum + review.rating,
+                0
+              ) / reviews.length
+            : 0;
+
+        setAvgRating(Number(averageRating.toFixed(1)));
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchReviews();
+  }, [id]);
+
   const handleCart = async () => {
     try {
-      const response = await axios.post(
-        `/api/addtocart/${id}`,
-        {
-          username: user?.username,
-        }
-      );
+      const response = await axios.post(`/api/addtocart/${id}`, {
+        username: user?.username,
+      });
       if (response.data.status === true) {
         router.push("/cart");
       } else {
@@ -72,9 +107,17 @@ export function BookCardComponent({
               ${price.toFixed(2)}
             </div>
           </div>
-          <div className="flex items-center text-xs text-gray-500 mb-3">
+          <div className="flex items-center text-xs text-gray-500 mb-2">
             <PersonIcon className="w-3 h-3 mr-1 flex-shrink-0" />
             <span className="truncate">Lent by {lender}</span>
+          </div>
+          <div className="flex items-center text-xs text-gray-500 mb-3">
+            <Star className="w-3 h-3 mr-1 flex-shrink-0 text-yellow-400" />
+            <span>{avgRating}</span>
+            <span className="mx-1">•</span>
+            <span>
+              {ratings} {ratings <= 1 ? "rating" : "ratings"}
+            </span>
           </div>
           <div className="flex gap-1">
             <Button
@@ -85,14 +128,13 @@ export function BookCardComponent({
             </Button>
             <Button
               className="w-full bg-[#203e76] hover:bg-[#2a4b8d] text-white"
-              asChild
+              onClick={handleCart}
             >
-              <button onClick={e=>handleCart()}>Add to Cart</button>
+              Add to Cart
             </Button>
           </div>
         </div>
       </div>
     </Card>
-    
   );
 }
