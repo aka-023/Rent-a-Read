@@ -106,8 +106,7 @@ export function AdminDashboardComponent({ users }: { users: User[] }) {
                 <TableRow>
                   <TableHead>Username</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Score</TableHead>
-                  <TableHead>Reports</TableHead>
+                  <TableHead>Admin Status</TableHead>
                   <TableHead>Delete User</TableHead>
                 </TableRow>
               </TableHeader>
@@ -118,14 +117,8 @@ export function AdminDashboardComponent({ users }: { users: User[] }) {
                       {user.username}
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`${getScoreColor(user.score)} text-white`}
-                      >
-                        {user.score}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{user.reports}</TableCell>
+                    <TableCell>{user.admin ? "True" : "False"}</TableCell>
+
                     <TableCell>
                       <button onClick={() => handleDelete(user._id)}>
                         <Trash2 className="text-red-600 size-5" />
