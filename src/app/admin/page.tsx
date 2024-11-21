@@ -1,11 +1,9 @@
 "use client";
-import Details from "@/components/Details/Details";
 import Loading from "@/components/Loading/Loading";
 import { useUser } from "@clerk/nextjs";
 import authenticate from "@/server/action";
 import { AdminDashboardComponent } from "@/components/admin-dashboard";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface User {
@@ -44,7 +42,7 @@ export interface Rent {
   username: string;
   book: Book;
   duration: number;
-  amount:number;
+  amount: number;
   isReturned: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -56,7 +54,6 @@ function AdminPage() {
   const [access, setAccess] = useState<boolean>(false);
   const [showUsers, setShowUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const router = useRouter();
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -67,7 +64,9 @@ function AdminPage() {
       const checkAdminStatus = async () => {
         setLoading(true);
         try {
-          const response = await axios.get(`/api/admin?username=${user.username}`);
+          const response = await axios.get(
+            `/api/admin?username=${user.username}`
+          );
           if (response.data.status === true) {
             setShowUsers(response.data.users);
             setAccess(true);

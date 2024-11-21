@@ -1,8 +1,6 @@
 "use client";
-import SearchIcon from "@mui/icons-material/Search";
 import React, { useState } from "react";
 import { Book } from "@/app/admin/page";
-import Search from "../Search/Search";
 import Link from "next/link";
 import { BookCardComponent } from "../book-card";
 
@@ -11,24 +9,19 @@ interface Booksprop {
 }
 
 const BookList = ({ books }: Booksprop) => {
-  const [search, setSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const bookVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    }),
-  };
+  // Filter books based on the search term
+  const filteredBooks = books.filter((book) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      book.name.toLowerCase().includes(searchLower) ||
+      book.author.toLowerCase().includes(searchLower)
+    );
+  });
 
   return (
-    <div className="w-full mx-auto py-10 ">
-      
+    <div className="w-full mx-auto py-10">
       {books && books.length > 0 ? (
         <div className="max-w-6xl mx-auto relative">
           <Link
@@ -41,31 +34,44 @@ const BookList = ({ books }: Booksprop) => {
             <h1 className="text-3xl font-semibold">
               Browse through our extensive Library
             </h1>
-
-            <div
-              className="h-[50px] w-[50px] rounded-full bg-gray-300 flex justify-center cursor-pointer items-center transition-all hover:scale-110 relative z-20"
-              onClick={() => setSearch(!search)}
-            >
-              <SearchIcon />
-            </div>
           </div>
-          {search && <Search />}
-          <div className="w-full ">
-            <div className="grid grid-cols-4 w-full gap-y-10">
-              {books.map((book: Book, index) => (
-                <div className="justify-self-center shadow-md rounded-xl">
-                  <BookCardComponent
-                    id={book._id}
-                    key={index}
-                    author={book.author}
-                    coverImage={book.url}
-                    lender={book.username}
-                    price={book.price}
-                    title={book.name}
-                  />
-                </div>
-              ))}
-            </div>
+
+          {/* Search Bar */}
+          <div className="mb-8 flex items-center ">
+            <input
+              type="text"
+              placeholder="Search by book name or author"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-1/3 mx-auto bg-gray-200 py-2 px-6 rounded-full outline-none"
+            />
+          </div>
+
+          {/* Book Cards */}
+          <div className="w-full">
+            {filteredBooks.length > 0 ? (
+              <div className="grid grid-cols-4 w-full gap-y-10">
+                {filteredBooks.map((book: Book, index) => (
+                  <div
+                    className="justify-self-center shadow-md rounded-xl"
+                    key={book._id}
+                  >
+                    <BookCardComponent
+                      id={book._id}
+                      author={book.author}
+                      coverImage={book.url}
+                      lender={book.username}
+                      price={book.price}
+                      title={book.name}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-lg font-semibold text-gray-500">
+                No books found for "{searchTerm}".
+              </div>
+            )}
           </div>
         </div>
       ) : (

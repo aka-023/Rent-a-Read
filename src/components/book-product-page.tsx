@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, DollarSign, ShoppingCart } from "lucide-react";
+import { BookOpen, ShoppingCart } from "lucide-react";
 import { PersonIcon } from "@radix-ui/react-icons";
 import ReviewComponent from "@/components/Review";
 import React, { useEffect, useState } from "react";
@@ -46,38 +46,37 @@ export function BookProductPageComponent({
   category,
 }: BookProductPageProps) {
   const router = useRouter();
-  const { user, isLoaded, isSignedIn } = useUser();
+  const { user, isSignedIn } = useUser();
   const [input, setInput] = useState(false);
   const [duration, setDuration] = useState<number>(1);
   const [avgRating, setAvgRating] = useState(0);
 
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch(`/api/addReview/${slugString}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+      const reviews = result.reviews;
+      const averageRating =
+        reviews.length != 0
+          ? reviews.reduce(
+              (sum: number, review: Review) => sum + review.rating,
+              0
+            ) / reviews.length
+          : 0;
+
+      setAvgRating(Number(averageRating.toFixed(1)));
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch(
-          `/api/addReview/${slugString}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        const result = await response.json();
-        const reviews = result.reviews;
-        const averageRating = reviews.length!=0?
-          reviews.reduce(
-            (sum: number, review: Review) => sum + review.rating,
-            0
-          ) / reviews.length:0;
-
-        setAvgRating(Number(averageRating.toFixed(1)));
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
     fetchReviews();
   }, [slugString]);
 
@@ -212,7 +211,7 @@ export function BookProductPageComponent({
           </div>
         </div>
       </div>
-      <ReviewComponent bookId={slugString} />
+      <ReviewComponent bookId={slugString} updateRating={fetchReviews} />
     </div>
   );
 }
