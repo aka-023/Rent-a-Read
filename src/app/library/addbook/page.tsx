@@ -1,70 +1,144 @@
-"use client";
-import axios from "axios";
-import React, { useState, ChangeEvent } from "react";
-import { useRouter } from "next/navigation";
-import Footer from "@/components/footer/Footer";
+//src/app/library/addbook/page.tsx
+"use client"
 
-interface Book {
-  name: string;
-  url: string;
-  author: string;
-  description: string;
-  price: number;
-  isbn: string;
-  username: string | null;
+import axios from "axios"
+import { useState, type ChangeEvent, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import Footer from "@/components/footer/Footer"
+import { CheckCircle, XCircle, X, Upload } from "lucide-react"
+
+interface BookPayload {
+  name: string
+  author: string 
+  description: string
+  price: number
+  isbn: string
+  username: string | null
+  imageUrl: string
 }
 
-function Page() {
-  const router = useRouter();
-  const [book, setBook] = useState<Book>({
+interface Message {
+  type: "success" | "error"
+  text: string
+}
+
+export default function Page() {
+  const router = useRouter()
+
+  // keep form fields except image file here
+  const [form, setForm] = useState({
     name: "",
-    url: "",
     author: "",
     description: "",
     price: 0,
     isbn: "",
-    username: localStorage.getItem("username"),
-  });
+    username: null as string | null,
+  })
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setBook((prevBook) => ({
-      ...prevBook,
-      [name]: value,
-    }));
-  };
+  // store the chosen file separately
+  const [file, setFile] = useState<File | null>(null)
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files ? e.target.files[0] : null;
-    if (file) {
-      setBook((prevBook) => ({
-        ...prevBook,
-        url: "/" + file.name,
-      }));
+  const [message, setMessage] = useState<Message | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // pull username from localStorage once
+  useEffect(() => {
+    const username = localStorage.getItem("username")
+    setForm((f) => ({ ...f, username }))
+  }, [])
+
+  // auto‑hide message
+  useEffect(() => {
+    if (!message) return
+    const t = setTimeout(() => setMessage(null), 5000)
+    return () => clearTimeout(t)
+  }, [message])
+
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const { name, value } = e.target
+    setForm((f) => ({
+      ...f,
+      [name]: name === "price" ? parseFloat(value) || 0 : value,
+    }))
+  }
+
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0] ?? null
+    if (!f) return
+
+    // validate
+    const okTypes = ["image/jpeg","image/png","image/webp"]
+    if (!okTypes.includes(f.type)) {
+      return setMessage({ type: "error", text: "Invalid image type." })
     }
-  };
+    if (f.size > 5*1024*1024) {
+      return setMessage({ type: "error", text: "Max size is 5 MB." })
+    }
 
-  const handleClick = async () => {
+    setFile(f)
+    setMessage(null)
+  }
+
+  function validate(): boolean {
+    if (!form.name.trim())    { setMessage({ type:"error", text:"Enter book name." }); return false }
+    if (!form.author.trim())  { setMessage({ type:"error", text:"Enter author." }); return false }
+    if (!form.description.trim()) { setMessage({ type:"error", text:"Enter description." }); return false }
+    if (!form.isbn.trim())    { setMessage({ type:"error", text:"Enter ISBN." }); return false }
+    if (form.price <= 0)      { setMessage({ type:"error", text:"Price must be > 0." }); return false }
+    if (!file)                { setMessage({ type:"error", text:"Please select a cover image." }); return false }
+    if (!form.username)       { setMessage({ type:"error", text:"Please log in first." }); return false }
+    return true
+  }
+
+  async function handleSubmit() {
+    console.log("lend book!!");
+    setMessage(null)
+    if (!validate()) return
+
+    setIsSubmitting(true)
     try {
-      const response = await axios.post("/api/add", {
-        ...book,
-        username: book.username,
-      });
-
-      if (response.data.status === false) {
-        alert(
-          "Message: " + (response.data?.message || "Internal Server Error")
-        );
-      } else {
-        router.push("/library");
+      // 1. upload image
+      const fm = new FormData()
+      fm.append("image", file!)
+      const uploadRes = await axios.post<{ imageUrl: string }>(
+        "/api/add/upload_image",
+        fm,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      )
+      const cloudinary_image_url = uploadRes.data.imageUrl
+      
+      console.log("book uploaded!!");
+      // 2️. save book
+      const payload: BookPayload = {
+           name: form.name,
+           author: form.author, 
+           description: form.description,
+           price: form.price,
+           isbn: form.isbn,
+           username: form.username,
+           imageUrl : cloudinary_image_url
       }
-    } catch (error) {
-      console.error("An error occurred while submitting the book:", error);
-      alert("An error occurred. Please try again.");
+
+      console.log("payload "+ payload);
+
+      const bookRes = await axios.post("/api/add", payload)
+      if (bookRes.data.status === false) {
+        throw new Error(bookRes.data.message || "Failed to save book")
+      }
+
+
+      setMessage({ type: "success", text: "Book uploaded! Redirecting…" })
+      setTimeout(() => router.push("/library"), 2000)
+    } catch (err: any) {
+      console.error(err)
+      setMessage({
+        type: "error",
+        text: err.response?.data?.message || err.message || "Unexpected error",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <>
@@ -74,109 +148,126 @@ function Page() {
             Upload Book Information
           </h2>
 
+          {message && (
+            <div className={`mb-6 flex items-center justify-between p-4 rounded-lg shadow-sm
+              ${message.type === "success"
+                ? "bg-green-50 border-l-4 border-green-400 text-green-800"
+                : "bg-red-50 border-l-4 border-red-400 text-red-800"
+              }`}>
+              <div className="flex items-center space-x-3">
+                {message.type === "success" ? <CheckCircle/> : <XCircle/>}
+                <span>{message.text}</span>
+              </div>
+              <button onClick={() => setMessage(null)}><X/></button>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-8">
             {/* Name */}
             <div>
-              <label className="block text-gray-900 font-semibold mb-1">
-                Book Name:
-              </label>
+              <label className="font-semibold">Book Name *</label>
               <input
-                type="text"
                 name="name"
-                value={book.name}
+                value={form.name}
                 onChange={handleChange}
-                className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-pink-40"
-                placeholder="Enter the book name"
+                disabled={isSubmitting}
+                className="w-full p-3 border rounded-lg"
+                placeholder="Enter book name"
               />
             </div>
 
-            {/* File Upload */}
+            {/* Cover Upload */}
             <div>
-              <label className="block text-gray-900 font-semibold mb-1">
-                Book Cover:
-              </label>
-              <input
-                type="file"
-                name="url"
-                onChange={handleFileChange}
-                className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-pink-40"
-              />
+              <label className="font-semibold">Cover Image *</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isSubmitting}
+                  className="w-full p-3 border rounded-lg"
+                />
+                <Upload className="absolute right-3 top-3 w-5 h-5 text-gray-400"/>
+              </div>
+              <p className="text-xs text-gray-500">Max 5 MB; JPEG/PNG/WebP</p>
             </div>
 
             {/* Author */}
             <div>
-              <label className="block text-gray-900 font-semibold mb-1">
-                Author:
-              </label>
+              <label className="font-semibold">Author *</label>
               <input
-                type="text"
                 name="author"
-                value={book.author}
+                value={form.author}
                 onChange={handleChange}
-                className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-pink-40"
-                placeholder="Enter the author's name"
+                disabled={isSubmitting}
+                className="w-full p-3 border rounded-lg"
+                placeholder="Author name"
               />
             </div>
 
             {/* ISBN */}
             <div>
-              <label className="block text-gray-900 font-semibold mb-1">
-                ISBN:
-              </label>
+              <label className="font-semibold">ISBN *</label>
               <input
-                type="text"
                 name="isbn"
-                value={book.isbn}
+                value={form.isbn}
                 onChange={handleChange}
-                className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-pink-40"
-                placeholder="Enter the ISBN"
+                disabled={isSubmitting}
+                className="w-full p-3 border rounded-lg"
+                placeholder="978-0123456789"
               />
             </div>
 
             {/* Description */}
             <div className="col-span-2">
-              <label className="block text-gray-900 font-semibold mb-1">
-                Description:
-              </label>
+              <label className="font-semibold">Description *</label>
               <textarea
                 name="description"
-                value={book.description}
+                value={form.description}
                 onChange={handleChange}
-                className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-pink-40"
-                placeholder="Describe the book"
+                disabled={isSubmitting}
+                className="w-full p-3 border rounded-lg"
+                placeholder="Brief description..."
                 rows={4}
               />
             </div>
 
-            {/* Price and Submit Button in the same row */}
-            <div className="flex space-x-4 items-end">
+            {/* Price + Submit */}
+            <div className="flex items-end space-x-4 col-span-2">
               <div className="flex-grow">
-                <label className="block text-gray-900 font-semibold mb-1">
-                  Price:
-                </label>
+                <label className="font-semibold">Price ($) *</label>
                 <input
-                  type="number"
                   name="price"
-                  value={book.price}
+                  type="number"
+                  value={form.price}
                   onChange={handleChange}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-pink-40"
-                  placeholder="Enter the price"
+                  disabled={isSubmitting}
+                  className="w-full p-3 border rounded-lg"
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
                 />
               </div>
 
               <button
-                onClick={handleClick}
-                className="bg-[#1a2a47] text-white font-bold py-3 px-8 rounded-full hover:bg-[#33415c] transition duration-300"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="flex items-center space-x-2 bg-[#1a2a47] text-white font-bold py-3 px-8 rounded-full hover:bg-[#33415c] disabled:bg-gray-400"
               >
-                Submit
+                {isSubmitting
+                  ? <span className="animate-spin h-4 w-4 border-b-2 border-white rounded-full"/>
+                  : <span>Submit</span>
+                }
               </button>
             </div>
           </div>
+
+          <p className="mt-6 text-center text-sm text-gray-500">
+            <span className="text-red-500">*</span> Required fields
+          </p>
         </div>
       </div>
       <Footer />
     </>
-  );
+  )
 }
-
-export default Page;

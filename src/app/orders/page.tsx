@@ -45,7 +45,7 @@ function Page() {
     const [deleteClick, setDeleteClick] = useState(true);
     const router = useRouter();
 
-    const { user, isLoaded, isSignedIn } = useUser();
+    const { user, isSignedIn } = useUser();
 
     useEffect(() => {
         if (!isSignedIn) {
@@ -75,7 +75,7 @@ function Page() {
         };
 
         fetchRentedBooks();
-    }, [returnClick, deleteClick, isLoaded, isSignedIn, user]);
+    }, [returnClick, deleteClick, isSignedIn, user]);
 
     const handleReturn = async (id: string) => {
         try {
@@ -181,7 +181,7 @@ function Page() {
                                 <div className="mt-4 flex flex-wrap gap-4">
                                     <div className="flex items-center">
                                         <span className="text-gray-700 font-medium">Price:</span>
-                                        <span className="ml-2 text-green-600">${rental.amount}</span>
+                                        <span className="ml-2 text-green-600">${rental.amount.toPrecision(2)}</span>
                                     </div>
                                     <div className="flex items-center">
                                         <span className="text-gray-700 font-medium">Lender:</span>

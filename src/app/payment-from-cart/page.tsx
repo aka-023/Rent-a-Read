@@ -23,7 +23,7 @@ function page({
     <>
       <div className="max-w-6xl mx-auto p-10 text-white text-center bg-gradient-to-tr from-red-500 to-red-950 relative top-[100px]">
         <div className="mb-10">
-          <h1 className='text-4xl font-extrabold mb-2'>Inkspire</h1>
+          <h1 className='text-4xl font-extrabold mb-2'>Rent-a-Read</h1>
           <h2 className='text-2xl'>
             has requested
             <span className="font-bold">${actual_amount}</span>

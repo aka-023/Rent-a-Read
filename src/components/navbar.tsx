@@ -31,7 +31,7 @@ export function NewNavbar() {
     const updateUserState = async () => {
       try {
         if (isLoaded && isSignedIn && user?.username) {
-          console.log("User logged in:", user);
+          // console.log("User logged in:", user);
           localStorage.setItem("username", user.username);
         } else {
           console.log("No user logged in");
@@ -69,7 +69,7 @@ export function NewNavbar() {
     >
       <div className="container max-w-6xl mx-auto flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold">Inkspire</span>
+          <span className="text-xl font-bold">Rent-a-Read</span>
         </Link>
 
         {/* Desktop Navigation */}

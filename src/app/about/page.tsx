@@ -14,7 +14,7 @@ const About: React.FC = () => {
         />
         <div className="absolute inset-0 bg-black flex items-center justify-center">
           <h1 className="text-5xl font-bold text-white drop-shadow-lg">
-            About Inkspire
+            About Rent-a-Read
           </h1>
         </div>
       </div>
@@ -25,7 +25,7 @@ const About: React.FC = () => {
           Our Mission
         </h2>
         <p className="text-lg text-gray-700 mb-4">
-          <span className="font-semibold">Inkspire</span> is more than just a
+          <span className="font-semibold">Rent-a-Read</span> is more than just a
           book rental platform. We aim to inspire creativity and knowledge by
           providing easy access to literature from all over the world. Whether
           you're looking for the latest bestseller or timeless classics, our

@@ -16,7 +16,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-//add the data in Inkspire.books.json in your database
+//add the data in Rent-a-Read .books.json in your database
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

@@ -13,9 +13,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body>
-          {/* <div className="flex">
-            <Navbar />
-          </div> */}
           <div className="bg-green-500">
             <NewNavbar />
           </div>

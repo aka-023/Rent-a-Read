@@ -21,7 +21,7 @@ function Header() {
           Your Gateway to Infinite Worlds!
         </h1>
         <p className="w-2/3 mt-5 text-xl text-white">
-          Welcome to InkSpire, where your literary adventures begin! Dive into a
+          Welcome to Rent-a-Read, where your literary adventures begin! Dive into a
           vast collection of books, from timeless classics to the latest
           bestsellers
         </p>
