@@ -1,25 +1,17 @@
 // src/app/api/add/book/route.ts
-
 import connectToDB from "@/server/connectToDB";
 import Book        from "@/server/models/bookmodels";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const {
-      name,
-      url,          // ← Cloudinary URL goes here now
-      author,
-      description,
-      price,
-      isbn,
-      username,
-    } = await req.json();
+    const { name, url, author, description, price, isbn, username } =
+      await req.json();
 
-    // basic validation
+    // Validate
     if (
       !name?.trim()    ||
-      !url?.trim()     || // ensure the image URL is present
+      !url?.trim()     ||
       !author?.trim()  ||
       !description?.trim() ||
       !isbn?.trim()    ||
@@ -28,20 +20,19 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         {
-          message: "Please provide all fields correctly (including a valid image URL).",
+          message:
+            "Please provide all fields correctly (including a valid image URL).",
           status: false,
         },
         { status: 400 }
       );
     }
 
-    // connect to MongoDB
     await connectToDB();
 
-    // create & save
     const newBook = await Book.create({
       name,
-      url,              // stores your Cloudinary link
+      url,
       author,
       description,
       price: Number(price),

@@ -1,7 +1,7 @@
 // next.config.js
 module.exports = {
   images: {
-    domains: ["img.clerk.com"], // Add the external domain here for images
+    domains: ["img.clerk.com", 'res.cloudinary.com'], // Add the external domain here for images
   },
 
   async headers() {
