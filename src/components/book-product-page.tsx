@@ -90,7 +90,7 @@ export function BookProductPageComponent({
     if (input) {
       if (price) {
         router.push(
-          `http://localhost:3000/payment?username=${user?.username}&amount=${(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/payment?username=${user?.username}&amount=${(
             duration * price
           ).toString()}&bookId=${slugString}&duration=${duration.toString()}`
         );
@@ -103,7 +103,7 @@ export function BookProductPageComponent({
   const handleCart = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:3000/api/addtocart/${slugString}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/addtocart/${slugString}`,
         {
           username: user?.username,
         }
