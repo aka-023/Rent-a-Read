@@ -1,4 +1,4 @@
-![Screenshot 2025-06-20 121125](https://github.com/user-attachments/assets/38ecb943-d6a6-43ab-9c7b-893cf1312efd)# 📚 Rent a Read
+# 📚 Rent a Read
 
 A modern book rental platform that helps readers enjoy offline books and allows owners to earn from their personal collections.
 
