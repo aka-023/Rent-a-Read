@@ -17,7 +17,7 @@ function page({
 }:{
     searchParams:{username:string,amount:string,cartItems:string}
 }) {
-  const actual_amount = parseInt(amount);
+  const actual_amount = parseInt(amount)+1;
 
   return (
     <>

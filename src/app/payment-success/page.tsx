@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from "@clerk/nextjs";
 import axios from 'axios';
 
 function page({
@@ -10,6 +11,15 @@ function page({
 }) {
   const hasCalledAPI = useRef(false);
   const router = useRouter();
+
+  // router.push("/orders")
+  const { isSignedIn } = useUser();
+
+    const takeToOrders = () => {
+      if (isSignedIn) {
+        router.push("/orders");
+      }
+    }
 
   useEffect(() => {
     const postRent = async () => {
@@ -45,7 +55,7 @@ function page({
         </div>
         <button
           className="p-3 bg-white font-bold text-black rounded mt-5 border hover:bg-red-950 hover:text-white transition-all hover:border-white"
-          onClick={() => router.push("/orders")}
+          onClick={takeToOrders}
         >
           Go to Orders
         </button>
