@@ -1,38 +1,80 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+![Screenshot 2025-06-20 121125](https://github.com/user-attachments/assets/38ecb943-d6a6-43ab-9c7b-893cf1312efd)# 📚 Rent a Read
 
-## Getting Started
+A modern book rental platform that helps readers enjoy offline books and allows owners to earn from their personal collections.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Tech Stack
+
+- **Next.js (App Router)** – Frontend framework  
+- **Clerk** – Authentication & user profiles  
+- **Stripe** – Secure payments  
+- **Cloudinary** – Image hosting & optimization  
+- **MongoDB Atlas** – NoSQL cloud database  
+
+---
+
+## ⚙️ Environment Variables
+
+### `.env.local` (Client-Side)
+
+```env
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=YOUR_CLOUD_NAME
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=YOUR_UPLOAD_PRESET
+NEXT_PUBLIC_CLOUDINARY_API_KEY=YOUR_API_KEY
+NEXT_PUBLIC_CLOUDINARY_API_SECRET=YOUR_API_SECRET
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=YOUR_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY=YOUR_CLERK_SECRET_KEY
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/auth/callback
+NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/auth/callback
+
+NEXT_PUBLIC_STRIPE_PUBLIC_KEY=YOUR_STRIPE_PUBLIC_KEY
+STRIPE_SECRET_KEY=YOUR_STRIPE_SECRET_KEY
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### `.env` (Server-Side)
 
-//add the data in Rent-a-Read .books.json in your database
+```env
+MONGO_URL="YOUR_MONGODB_CONNECTION_STRING"
+ADMIN_PASSWORD="YOUR_ADMIN_PASSWORD"
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 🧭 Website Flow
 
-## Learn More
+```text
+1. Landing Page → Welcome to Rent a Read 
+2. Library → Browse available books 
+3. Book Detail → View availability & reviews
+4. Rent → Sign up / log in 
+5. Checkout → Select days & pay 
+6. Review → Leave feedback 
+7. Orders → Track & return books 
+8. Cart → Save rentals for later 
+9. Profile → Manage your account
+10. Admin → View/delete users 
+```
 
-To learn more about Next.js, take a look at the following resources:
+> _Have a collection of books? Lend them out and earn! 💸_
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
+### Screenshots 📸
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+![Landing Page](https://github.com/user-attachments/assets/4c708b0a-4df8-4ae7-b9a4-e0b8240ed957)
+![Library](https://github.com/user-attachments/assets/27999764-80b0-4253-b033-72d09c954ea1)
+![Cart](https://github.com/user-attachments/assets/a8ab1323-007d-4a2a-9d96-4e4aad2010c8)
+![Book Details](https://github.com/user-attachments/assets/c594e24c-3b9d-48ef-b757-36ea2c5361a2)
+![Review](https://github.com/user-attachments/assets/0020f70c-10ca-4319-a405-cf87f9cc2814)
 
-## Deploy on Vercel
+---
+## 💡 Why Rent a Read?
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Experience the joy of **offline book reading** anywhere 📖  
+- Earn passive income by renting your **personal collection** 💰  
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+❤️ thank you for your time !!
